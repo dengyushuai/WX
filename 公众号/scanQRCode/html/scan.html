@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>扫一扫</title>
+</head>
+
+<body>
+    <div>
+        <span class="btnFun" style="border: 1px solid #000;">扫一扫</span>
+    </div>
+</body>
+<script src="../js/jquery-1.11.2.js"></script>
+<script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script>
+    /**
+        1、首先配置公众号的JS接口安全域名 业务域名 网页授权域名(3个域名要一致)
+        2、配置IP白名单 也就是把本地电脑IP添加到公众号IP白名单中
+        3、调用后台接口获取微信config配置项(appId(公众号的唯一标识): 公众号中可以取到 直接写死，timestamp(生产签名的时间戳): 后台返回，nonceStr(生成签名的随机串): 后台返回，signature(签名): 后台返回，jsApiList(需要使用JS接口列表，这里调用的扫一扫): ['scanQRCode'](公众号开发文档(https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#%E9%99%84%E5%BD%951-JS-SDK%E4%BD%BF%E7%94%A8%E6%9D%83%E9%99%90%E7%AD%BE%E5%90%8D%E7%AE%97%E6%B3%95)附录2-所有JS接口列表里))
+        4、引入微信js
+        5、这里以扫一扫为例 wx.scanQRCode 要写到wx.reday() 如下。
+        6、公众号扫一扫到这配置完成
+    */
+    $(".btnFun").click(function () {
+        var parma = {
+            parms: {
+                /**
+                    1、url为传给后台参数 后台用来请求签名
+                    2、url必须为页面的完整路径不能带#号 也就是域名 + 参数 例：www.baidu.com?name=1&age=2
+                    3、url的域名必须是真实域名，也就是说此url的域名要和公众号配置的JS接口安全域名 网页授权域名 业务域名 四个域名要一致；如果此url与公众号配置的域名不同就会报无效url 如果此url与公众号配置的域名相同（也就是说此url写死了，想在本地测试）与地址栏上不同（本地使用github测试）就会报签名错误（签名字段signature）
+                */
+                url: location.href.split('#')[0],
+            },
+            Url: "后台接口地址",
+        }
+
+        //发起请求  
+        $.ajax({
+            url: parma.Url,
+            data: parma.parms,
+            type: "post",
+            async: false,
+            success: function (data) {
+                console.log("成功返回config配置项")
+                wx.config({
+                    debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                    appId: '公众号的appId', // 必填，公众号的唯一标识
+                    timestamp: data.timestamp, // 必填，生成签名的时间戳    <%= Html.Encode(ViewData["timestamp" ]) %>
+                    nonceStr: data.nonceStr, // 必填，生成签名的随机串
+                    signature: data.signature, // 必填，签名
+                    jsApiList: ['scanQRCode'] // 必填，需要使用的JS接口列表, 这里只需要调用扫一扫
+                });
+
+                var ua = navigator.userAgent.toLowerCase();
+                var isWeixin = ua.indexOf('micromessenger') !== -1;
+                if (!isWeixin) {
+                    alert('请用微信打开连接，才可使用扫一扫');
+                }
+
+                wx.ready(() => {
+                    alert("进入微信ready方法")
+                    wx.scanQRCode({
+                        needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+                        scanType: ["qrCode", "barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+                        success: function (res) {
+                            console.log("扫一扫成功")
+
+                            // 扫码成功，跳转到二维码指定页面（res.resultStr为扫码返回的结果）  
+                            location.href = res.resultStr; // 微信扫描二维码后返回的地址(也可能返回的不是跳转地址，这要看二维码内存储的内容)
+                        },
+
+                        error: function (res) {
+                            alert("扫一扫失败")
+                            if (res.errMsg.indexOf('function_not_exist') > 0) {
+                                alert('当前版本过低，请进行升级');
+                            }
+                        }
+                    });
+                });
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    })
+</script>
+
+</html>
