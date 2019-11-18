@@ -7,7 +7,7 @@
     * timestamp(生产签名的时间戳): 后台返回 <br/>
     * nonceStr(生成签名的随机串): 后台返回 <br/>
     * signature(签名): 后台返回 <br/>
-    * jsApiList(需要使用JS接口列表，这里调用的扫一扫): ['scanQRCode'](公众号开发文档(<a  href="https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#%E9%99%84%E5%BD%951-JS-SDK%E4%BD%BF%E7%94%A8%E6%9D%83%E9%99%90%E7%AD%BE%E5%90%8D%E7%AE%97%E6%B3%95">接口列表地址<a/>)附录2-所有JS接口列表里) <br/>
+    *jsApiList(需要使用JS接口列表，这里调用的扫一扫): ['scanQRCode'](公众号开发文档(<a  href="https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#%E9%99%84%E5%BD%951-JS-SDK%E4%BD%BF%E7%94%A8%E6%9D%83%E9%99%90%E7%AD%BE%E5%90%8D%E7%AE%97%E6%B3%95">接口列表地址<a/>)附录2-所有JS接口列表里) <br/>
 4、引入微信js<script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script> <br/>
 5、这里以扫一扫为例 wx.scanQRCode()方法要写到wx.reday() <br/>
 6，公众号扫一扫到这配置完成
